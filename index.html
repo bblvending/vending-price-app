@@ -11,24 +11,70 @@
 <link rel="manifest" href="manifest.json">
 <title>Vending Price Calculator</title>
 <style>
-*{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:0;background:#f2f2f2;color:#222;padding:14px 14px 40px}.app{max-width:920px;margin:auto;background:white;padding:16px;border-radius:14px;box-shadow:0 2px 9px rgba(0,0,0,.14)}h1{font-size:24px;margin:0 0 8px}h2{font-size:20px;margin:22px 0 8px}label{display:block;font-weight:bold;margin-top:12px}input,select,button{width:100%;padding:13px;margin-top:5px;font-size:16px;border:1px solid #bbb;border-radius:9px;background:white}button{background:#222;color:white;border:none;font-weight:bold}button.secondary{background:#666}button.danger{background:#9b1c1c}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.result{margin-top:15px;padding:13px;border-radius:9px;background:#eef8ee;border:1px solid #abd0ab;line-height:1.5;font-size:17px}.notice{margin-top:10px;padding:10px;border-radius:9px;background:#fff6d8;border:1px solid #d5bd65;font-size:14px;line-height:1.35}.tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}.tab{background:#e7e7e7;color:#222}.tab.active{background:#222;color:white}.section{display:none}.section.active{display:block}table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}th,td{border-bottom:1px solid #ddd;padding:7px;text-align:left;vertical-align:top}th{background:#eee}.small{font-size:13px;color:#666;margin-top:8px;line-height:1.35}.search{margin-top:12px}.kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.kpi div{background:#f6f6f6;border:1px solid #ddd;padding:10px;border-radius:9px}.kpi b{display:block;font-size:20px;margin-top:4px}@media(max-width:700px){.row,.kpi{grid-template-columns:1fr}table{font-size:11px}th,td{padding:5px}.app{padding:14px}}
+*{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:0;background:#f2f2f2;color:#222;padding:14px 14px 40px}.app{max-width:980px;margin:auto;background:white;padding:16px;border-radius:14px;box-shadow:0 2px 9px rgba(0,0,0,.14)}h1{font-size:24px;margin:0 0 8px}h2{font-size:20px;margin:22px 0 8px}label{display:block;font-weight:bold;margin-top:12px}input,select,button{width:100%;padding:13px;margin-top:5px;font-size:16px;border:1px solid #bbb;border-radius:9px;background:white}button{background:#222;color:white;border:none;font-weight:bold}button.secondary{background:#666}button.danger{background:#9b1c1c}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.result{margin-top:15px;padding:13px;border-radius:9px;background:#eef8ee;border:1px solid #abd0ab;line-height:1.5;font-size:17px}.notice{margin-top:10px;padding:10px;border-radius:9px;background:#fff6d8;border:1px solid #d5bd65;font-size:14px;line-height:1.35}.tabs{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:14px}.tab{background:#e7e7e7;color:#222}.tab.active{background:#222;color:white}.section{display:none}.section.active{display:block}table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}th,td{border-bottom:1px solid #ddd;padding:7px;text-align:left;vertical-align:top}th{background:#eee}.small{font-size:13px;color:#666;margin-top:8px;line-height:1.35}.search{margin-top:12px}.kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.kpi div{background:#f6f6f6;border:1px solid #ddd;padding:10px;border-radius:9px}.kpi b{display:block;font-size:20px;margin-top:4px}video{width:100%;border-radius:12px;background:#111;margin-top:10px;display:none}.scanbox{border:1px solid #ddd;background:#f7f7f7;border-radius:10px;padding:12px;margin-top:12px}@media(max-width:760px){.row,.kpi{grid-template-columns:1fr}.tabs{grid-template-columns:1fr 1fr}table{font-size:11px}th,td{padding:5px}.app{padding:14px}}
 </style>
 </head>
 <body>
 <div class="app">
 <h1>Vending Price Calculator</h1>
-<div class="small">Calculates tax, bottle deposit, cost each, suggested sale price, and saves your product list on this phone.</div>
-<div class="tabs"><button class="tab active" data-tab="calc">Calculator</button><button class="tab" data-tab="list">Saved List</button><button class="tab" data-tab="settings">Settings</button></div>
+<div class="small">Version 2: scan a barcode, try to pull product info, enter BJ’s shelf price, then calculate and save.</div>
+<div class="tabs">
+<button class="tab active" data-tab="scan">Scan</button>
+<button class="tab" data-tab="calc">Calculator</button>
+<button class="tab" data-tab="list">Saved List</button>
+<button class="tab" data-tab="settings">Settings</button>
+</div>
 
-<section id="calc" class="section active">
+<section id="scan" class="section active">
+<div class="notice">
+Barcode scanning works best when this app is opened from the Home Screen or Safari over HTTPS. If camera scanning does not start, enter the UPC manually.
+</div>
+<div class="scanbox">
+<button type="button" id="startScanBtn">Start Barcode Scanner</button>
+<button type="button" id="stopScanBtn" class="secondary">Stop Scanner</button>
+<video id="video" playsinline></video>
+<label>UPC / Barcode Number</label>
+<input type="text" id="upc" inputmode="numeric" placeholder="Scan or type UPC">
+<button type="button" id="lookupBtn" class="secondary">Look Up Product Info</button>
+<div class="result" id="scanResult">Scan or enter a UPC to begin.</div>
+</div>
+</section>
+
+<section id="calc" class="section">
 <form id="calcForm">
-<div class="row"><div><label>Date</label><input type="date" id="date"></div><div><label>Product Type</label><select id="productType"><option>Drink</option><option>Snack</option><option>Other</option></select></div></div>
-<label>Product Name</label><input type="text" id="product" placeholder="Monster Energy, Welch's Fruit Snacks, etc.">
-<div class="row"><div><label>Total Cost Before Tax And Deposit</label><input type="number" id="baseCost" step="0.01" inputmode="decimal" placeholder="Example: 43.49"></div><div><label>Quantity</label><input type="number" id="quantity" step="1" inputmode="numeric" placeholder="Example: 24"></div></div>
-<div class="row"><div><label>Taxable?</label><select id="taxable"><option value="no">No</option><option value="yes">Yes</option></select></div><div><label>Deposit?</label><select id="deposit"><option value="no">No</option><option value="yes">Yes, add 5¢ each</option></select></div></div>
-<div class="row"><div><label>Markup</label><select id="markup"><option value="100">100% markup</option><option value="75">75% markup</option><option value="60">60% markup</option><option value="50">50% markup</option><option value="40">40% markup</option><option value="custom">Custom</option></select></div><div><label>Round Sale Price To</label><select id="roundTo"><option value="0.25">Nearest 25¢</option><option value="0.50">Nearest 50¢</option><option value="1.00">Nearest $1.00</option><option value="0.05">Nearest 5¢</option></select></div></div>
-<label id="customLabel" style="display:none;">Custom Markup %</label><input type="number" id="customMarkup" step="1" inputmode="numeric" style="display:none;" placeholder="Example: 85">
-<button type="submit">Calculate</button><button type="button" id="saveBtn" class="secondary">Save To List</button>
+<div class="row">
+<div><label>Date</label><input type="date" id="date"></div>
+<div><label>Product Type</label><select id="productType"><option>Drink</option><option>Snack</option><option>Other</option></select></div>
+</div>
+
+<label>Product Name</label>
+<input type="text" id="product" placeholder="Monster Energy, Welch's Fruit Snacks, etc.">
+
+<div class="row">
+<div><label>Brand</label><input type="text" id="brand" placeholder="Optional"></div>
+<div><label>Size / Package Info</label><input type="text" id="sizeInfo" placeholder="24 x 16 oz, 20 ct, etc."></div>
+</div>
+
+<div class="row">
+<div><label>BJ’s Shelf Price Before Tax And Deposit</label><input type="number" id="baseCost" step="0.01" inputmode="decimal" placeholder="Example: 43.49"></div>
+<div><label>Quantity</label><input type="number" id="quantity" step="1" inputmode="numeric" placeholder="Example: 24"></div>
+</div>
+
+<div class="row">
+<div><label>Taxable?</label><select id="taxable"><option value="no">No</option><option value="yes">Yes</option></select></div>
+<div><label>Deposit?</label><select id="deposit"><option value="no">No</option><option value="yes">Yes, add 5¢ each</option></select></div>
+</div>
+
+<div class="row">
+<div><label>Markup</label><select id="markup"><option value="100">100% markup</option><option value="75">75% markup</option><option value="60">60% markup</option><option value="50">50% markup</option><option value="40">40% markup</option><option value="custom">Custom</option></select></div>
+<div><label>Round Sale Price To</label><select id="roundTo"><option value="0.25">Nearest 25¢</option><option value="0.50">Nearest 50¢</option><option value="1.00">Nearest $1.00</option><option value="0.05">Nearest 5¢</option></select></div>
+</div>
+
+<label id="customLabel" style="display:none;">Custom Markup %</label>
+<input type="number" id="customMarkup" step="1" inputmode="numeric" style="display:none;" placeholder="Example: 85">
+
+<button type="submit">Calculate</button>
+<button type="button" id="saveBtn" class="secondary">Save To List</button>
 </form>
 <div class="result" id="result">Suggested price will show here.</div>
 </section>
@@ -36,40 +82,142 @@
 <section id="list" class="section">
 <input class="search" type="text" id="searchBox" placeholder="Search saved products">
 <div class="kpi"><div>Total Saved Products<b id="countKpi">0</b></div><div>Average Profit Each<b id="profitKpi">$0.00</b></div></div>
-<button type="button" id="exportBtn" class="secondary">Export CSV</button><button type="button" id="clearBtn" class="danger">Clear List</button>
-<table><thead><tr><th>Date</th><th>Product</th><th>Type</th><th>Tax</th><th>Deposit</th><th>Cost Each</th><th>Price</th></tr></thead><tbody id="savedList"></tbody></table>
+<button type="button" id="exportBtn" class="secondary">Export CSV</button>
+<button type="button" id="clearBtn" class="danger">Clear List</button>
+<table><thead><tr><th>Date</th><th>Product</th><th>Brand</th><th>Size</th><th>Cost Each</th><th>Price</th></tr></thead><tbody id="savedList"></tbody></table>
 </section>
 
 <section id="settings" class="section">
 <div class="notice">For Nassau and Suffolk, the default sales tax rate is 8.625%. NYC is 8.875%. You can change it below.</div>
 <label>Default Tax Rate %</label><input type="number" id="taxRate" step="0.001" inputmode="decimal" value="8.625">
 <label>Default Markup %</label><input type="number" id="defaultMarkup" step="1" inputmode="numeric" value="100">
-<button type="button" id="saveSettingsBtn">Save Settings</button><button type="button" id="gpsBtn" class="secondary">Use GPS Tax Estimate</button>
+<button type="button" id="saveSettingsBtn">Save Settings</button>
+<button type="button" id="gpsBtn" class="secondary">Use GPS Tax Estimate</button>
 <div class="result" id="settingsResult">Settings status will show here.</div>
 </section>
 </div>
 
 <script>
 (function(){
-let currentCalc=null;
+let currentCalc=null, stream=null, scanTimer=null, detector=null;
 const byId=id=>document.getElementById(id);
 const money=n=>"$"+Number(n).toFixed(2);
 const roundUp=(v,i)=>Math.ceil(v/i)*i;
-const getItems=()=>{try{return JSON.parse(localStorage.getItem("vendingItemsPWA")||"[]")}catch(e){return[]}};
-const setItems=items=>localStorage.setItem("vendingItemsPWA",JSON.stringify(items));
-const getSettings=()=>{try{return JSON.parse(localStorage.getItem("vendingSettingsPWA")||'{"taxRate":8.625,"defaultMarkup":100}')}catch(e){return{taxRate:8.625,defaultMarkup:100}}};
-const setSettings=s=>localStorage.setItem("vendingSettingsPWA",JSON.stringify(s));
+const getItems=()=>{try{return JSON.parse(localStorage.getItem("vendingItemsPWA2")||"[]")}catch(e){return[]}};
+const setItems=items=>localStorage.setItem("vendingItemsPWA2",JSON.stringify(items));
+const getSettings=()=>{try{return JSON.parse(localStorage.getItem("vendingSettingsPWA2")||'{"taxRate":8.625,"defaultMarkup":100}')}catch(e){return{taxRate:8.625,defaultMarkup:100}}};
+const setSettings=s=>localStorage.setItem("vendingSettingsPWA2",JSON.stringify(s));
 function showTab(name){document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));document.querySelectorAll(".section").forEach(s=>s.classList.toggle("active",s.id===name));if(name==="list")loadItems()}
 function showCustomMarkup(){let custom=byId("markup").value==="custom";byId("customLabel").style.display=custom?"block":"none";byId("customMarkup").style.display=custom?"block":"none"}
 function applySettings(){let s=getSettings();byId("taxRate").value=s.taxRate;byId("defaultMarkup").value=s.defaultMarkup;if(["100","75","60","50","40"].includes(String(s.defaultMarkup))){byId("markup").value=String(s.defaultMarkup)}else{byId("markup").value="custom";byId("customMarkup").value=s.defaultMarkup}showCustomMarkup()}
-function calculate(){let date=byId("date").value,product=byId("product").value.trim(),productType=byId("productType").value,baseCost=parseFloat(byId("baseCost").value),quantity=parseInt(byId("quantity").value,10),taxable=byId("taxable").value==="yes",deposit=byId("deposit").value==="yes",taxRate=parseFloat(byId("taxRate").value||"0"),roundTo=parseFloat(byId("roundTo").value);let markup=byId("markup").value;markup=markup==="custom"?parseFloat(byId("customMarkup").value):parseFloat(markup);if(!date||!product||isNaN(baseCost)||isNaN(quantity)||quantity<=0||isNaN(markup)||isNaN(taxRate)){alert("Fill in product, cost, quantity, tax rate, and markup.");return false}let taxAmount=taxable?baseCost*(taxRate/100):0,depositAmount=deposit?quantity*.05:0,totalCost=baseCost+taxAmount+depositAmount,costEach=totalCost/quantity,rawSale=costEach*(1+markup/100),suggestedPrice=roundUp(rawSale,roundTo),profitEach=suggestedPrice-costEach;currentCalc={date,product,productType,baseCost:baseCost.toFixed(2),quantity,taxable:taxable?"Yes":"No",taxRate:taxRate.toFixed(3),taxAmount:taxAmount.toFixed(2),deposit:deposit?"Yes":"No",depositAmount:depositAmount.toFixed(2),totalCost:totalCost.toFixed(2),costEach:costEach.toFixed(2),markup,suggestedPrice:suggestedPrice.toFixed(2),profitEach:profitEach.toFixed(2)};byId("result").innerHTML="<b>Tax:</b> "+(taxable?money(taxAmount)+" at "+taxRate+"%":"No tax added")+"<br><b>Deposit:</b> "+(deposit?money(depositAmount)+" total, 5¢ x "+quantity:"No deposit added")+"<br><b>Total true cost:</b> "+money(totalCost)+"<br><b>Cost each:</b> "+money(costEach)+"<br><b>Suggested sale price:</b> "+money(suggestedPrice)+"<br><b>Estimated profit each:</b> "+money(profitEach);return true}
+function fillProduct(data){
+ byId("upc").value=data.upc||byId("upc").value;
+ byId("product").value=data.product||"";
+ byId("brand").value=data.brand||"";
+ byId("sizeInfo").value=data.size||"";
+ byId("quantity").value=data.quantity||"";
+ showTab("calc");
+ byId("baseCost").focus();
+}
+async function lookupProduct(){
+ let upc=byId("upc").value.trim();
+ if(!upc){alert("Scan or enter a UPC first.");return}
+ byId("scanResult").innerHTML="Looking up UPC "+upc+"...";
+ try{
+  let url="https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(upc)+".json";
+  let res=await fetch(url);
+  let json=await res.json();
+  if(json.status!==1 || !json.product){
+   byId("scanResult").innerHTML="No product found. You can still type the product manually.";
+   showTab("calc");
+   return;
+  }
+  let p=json.product;
+  let name=p.product_name || p.generic_name || "";
+  let brand=p.brands || "";
+  let size=p.quantity || p.product_quantity || "";
+  let cats=(p.categories||"").toLowerCase();
+  let type=cats.includes("beverage")||cats.includes("drink")||cats.includes("water")||cats.includes("soda")?"Drink":"Snack";
+  byId("scanResult").innerHTML="<b>Found:</b> "+(name||"Unnamed product")+"<br><b>Brand:</b> "+brand+"<br><b>Size:</b> "+size+"<br>Enter BJ’s shelf price next.";
+  byId("productType").value=type;
+  fillProduct({upc,product:name,brand,size});
+ }catch(e){
+  byId("scanResult").innerHTML="Lookup failed. You may be offline or the product database is unavailable. Type it manually.";
+ }
+}
+async function startScanner(){
+ if(!("BarcodeDetector" in window)){
+  byId("scanResult").innerHTML="This browser does not support built in barcode scanning. Type the UPC manually.";
+  return;
+ }
+ try{
+  detector=new BarcodeDetector({formats:["ean_13","ean_8","upc_a","upc_e","code_128"]});
+  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
+  let video=byId("video");
+  video.srcObject=stream; video.style.display="block"; await video.play();
+  byId("scanResult").innerHTML="Scanner running. Point the camera at the barcode.";
+  scanTimer=setInterval(async()=>{
+   try{
+    let codes=await detector.detect(video);
+    if(codes && codes.length){
+     let code=codes[0].rawValue;
+     byId("upc").value=code;
+     stopScanner();
+     byId("scanResult").innerHTML="Scanned UPC: "+code+"<br>Looking up product...";
+     lookupProduct();
+    }
+   }catch(e){}
+  },600);
+ }catch(e){
+  byId("scanResult").innerHTML="Camera could not start. Make sure you opened the app from Safari or the Home Screen and allowed camera access.";
+ }
+}
+function stopScanner(){
+ if(scanTimer){clearInterval(scanTimer);scanTimer=null}
+ if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+ byId("video").style.display="none";
+}
+function calculate(){
+ let date=byId("date").value,product=byId("product").value.trim(),brand=byId("brand").value.trim(),sizeInfo=byId("sizeInfo").value.trim(),productType=byId("productType").value,baseCost=parseFloat(byId("baseCost").value),quantity=parseInt(byId("quantity").value,10),taxable=byId("taxable").value==="yes",deposit=byId("deposit").value==="yes",taxRate=parseFloat(byId("taxRate").value||"0"),roundTo=parseFloat(byId("roundTo").value);
+ let markup=byId("markup").value; markup=markup==="custom"?parseFloat(byId("customMarkup").value):parseFloat(markup);
+ if(!date||!product||isNaN(baseCost)||isNaN(quantity)||quantity<=0||isNaN(markup)||isNaN(taxRate)){alert("Fill in product, BJ’s price, quantity, tax rate, and markup.");return false}
+ let taxAmount=taxable?baseCost*(taxRate/100):0,depositAmount=deposit?quantity*.05:0,totalCost=baseCost+taxAmount+depositAmount,costEach=totalCost/quantity,rawSale=costEach*(1+markup/100),suggestedPrice=roundUp(rawSale,roundTo),profitEach=suggestedPrice-costEach;
+ currentCalc={date,upc:byId("upc").value.trim(),product,brand,sizeInfo,productType,baseCost:baseCost.toFixed(2),quantity,taxable:taxable?"Yes":"No",taxRate:taxRate.toFixed(3),taxAmount:taxAmount.toFixed(2),deposit:deposit?"Yes":"No",depositAmount:depositAmount.toFixed(2),totalCost:totalCost.toFixed(2),costEach:costEach.toFixed(2),markup,suggestedPrice:suggestedPrice.toFixed(2),profitEach:profitEach.toFixed(2)};
+ byId("result").innerHTML="<b>Tax:</b> "+(taxable?money(taxAmount)+" at "+taxRate+"%":"No tax added")+"<br><b>Deposit:</b> "+(deposit?money(depositAmount)+" total, 5¢ x "+quantity:"No deposit added")+"<br><b>Total true cost:</b> "+money(totalCost)+"<br><b>Cost each:</b> "+money(costEach)+"<br><b>Suggested sale price:</b> "+money(suggestedPrice)+"<br><b>Estimated profit each:</b> "+money(profitEach);
+ return true;
+}
 function saveItem(){if(!currentCalc){if(!calculate())return}let items=getItems();items.push(currentCalc);setItems(items);byId("result").innerHTML+="<br><b>Saved.</b>";loadItems()}
-function loadItems(){let items=getItems(),q=(byId("searchBox")?.value||"").toLowerCase(),filtered=items.filter(i=>!q||i.product.toLowerCase().includes(q)||i.productType.toLowerCase().includes(q)),body=byId("savedList");body.innerHTML="";filtered.slice().reverse().forEach(i=>{let tr=document.createElement("tr");tr.innerHTML="<td>"+i.date+"</td><td>"+i.product+"</td><td>"+i.productType+"</td><td>"+i.taxable+"<br>"+(i.taxable==="Yes"?money(i.taxAmount):"")+"</td><td>"+i.deposit+"<br>"+(i.deposit==="Yes"?money(i.depositAmount):"")+"</td><td>"+money(i.costEach)+"</td><td><b>"+money(i.suggestedPrice)+"</b></td>";body.appendChild(tr)});byId("countKpi").textContent=items.length;let avg=items.length?items.reduce((a,b)=>a+parseFloat(b.profitEach||0),0)/items.length:0;byId("profitKpi").textContent=money(avg)}
-function clearList(){if(confirm("Clear all saved products?")){localStorage.removeItem("vendingItemsPWA");loadItems()}}
-function exportCSV(){let items=getItems();if(items.length===0){alert("No saved items to export.");return}let csv="Date,Product,Type,Base Cost,Quantity,Taxable,Tax Rate,Tax Amount,Deposit,Deposit Amount,Total Cost,Cost Each,Markup %,Suggested Sale Price,Profit Each\n";items.forEach(i=>{csv+=`"${i.date}","${i.product}","${i.productType}","${i.baseCost}","${i.quantity}","${i.taxable}","${i.taxRate}","${i.taxAmount}","${i.deposit}","${i.depositAmount}","${i.totalCost}","${i.costEach}","${i.markup}","${i.suggestedPrice}","${i.profitEach}"\n`});let blob=new Blob([csv],{type:"text/csv"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="vending_price_list.csv";document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url)}
+function loadItems(){
+ let items=getItems(),q=(byId("searchBox")?.value||"").toLowerCase(),filtered=items.filter(i=>!q||(i.product||"").toLowerCase().includes(q)||(i.brand||"").toLowerCase().includes(q)||(i.upc||"").includes(q)),body=byId("savedList");body.innerHTML="";
+ filtered.slice().reverse().forEach(i=>{let tr=document.createElement("tr");tr.innerHTML="<td>"+i.date+"</td><td>"+i.product+"<br><span class='small'>"+(i.upc||"")+"</span></td><td>"+(i.brand||"")+"</td><td>"+(i.sizeInfo||"")+"</td><td>"+money(i.costEach)+"</td><td><b>"+money(i.suggestedPrice)+"</b></td>";body.appendChild(tr)});
+ byId("countKpi").textContent=items.length;let avg=items.length?items.reduce((a,b)=>a+parseFloat(b.profitEach||0),0)/items.length:0;byId("profitKpi").textContent=money(avg);
+}
+function clearList(){if(confirm("Clear all saved products?")){localStorage.removeItem("vendingItemsPWA2");loadItems()}}
+function exportCSV(){
+ let items=getItems();if(items.length===0){alert("No saved items to export.");return}
+ let csv="Date,UPC,Product,Brand,Size,Type,BJs Price,Quantity,Taxable,Tax Rate,Tax Amount,Deposit,Deposit Amount,Total Cost,Cost Each,Markup %,Suggested Sale Price,Profit Each\n";
+ items.forEach(i=>{csv+=`"${i.date}","${i.upc||""}","${i.product}","${i.brand||""}","${i.sizeInfo||""}","${i.productType}","${i.baseCost}","${i.quantity}","${i.taxable}","${i.taxRate}","${i.taxAmount}","${i.deposit}","${i.depositAmount}","${i.totalCost}","${i.costEach}","${i.markup}","${i.suggestedPrice}","${i.profitEach}"\n`});
+ let blob=new Blob([csv],{type:"text/csv"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="vending_price_list.csv";document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
 function saveSettings(){let s={taxRate:parseFloat(byId("taxRate").value||"8.625"),defaultMarkup:parseFloat(byId("defaultMarkup").value||"100")};setSettings(s);applySettings();byId("settingsResult").innerHTML="Settings saved."}
 function gpsEstimate(){if(!navigator.geolocation){alert("GPS is not available here.");return}byId("settingsResult").innerHTML="Checking GPS...";navigator.geolocation.getCurrentPosition(pos=>{let lat=pos.coords.latitude,lon=pos.coords.longitude,rate=8.625,label="Defaulted to 8.625%. Verify the rate.";if(lat>=40.54&&lat<=40.98&&lon>=-73.80&&lon<=-73.42){rate=8.625;label="Estimated Nassau County / Long Island, NY."}else if(lat>=40.65&&lat<=41.12&&lon>=-73.50&&lon<=-72.95){rate=8.625;label="Estimated Suffolk County, NY."}else if(lat>=40.47&&lat<=40.92&&lon>=-74.28&&lon<=-73.68){rate=8.875;label="Estimated New York City, NY."}byId("taxRate").value=rate;saveSettings();byId("settingsResult").innerHTML=label+" Tax rate set to "+rate+"%."},()=>{byId("settingsResult").innerHTML="GPS denied or unavailable. Enter tax rate manually."})}
-document.addEventListener("DOMContentLoaded",()=>{byId("date").valueAsDate=new Date();applySettings();document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));byId("markup").addEventListener("change",showCustomMarkup);byId("calcForm").addEventListener("submit",e=>{e.preventDefault();calculate()});byId("saveBtn").addEventListener("click",saveItem);byId("exportBtn").addEventListener("click",exportCSV);byId("clearBtn").addEventListener("click",clearList);byId("saveSettingsBtn").addEventListener("click",saveSettings);byId("gpsBtn").addEventListener("click",gpsEstimate);byId("searchBox").addEventListener("input",loadItems);loadItems();if("serviceWorker" in navigator){navigator.serviceWorker.register("./service-worker.js").catch(()=>{})}});
+document.addEventListener("DOMContentLoaded",()=>{
+ byId("date").valueAsDate=new Date();applySettings();
+ document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
+ byId("markup").addEventListener("change",showCustomMarkup);
+ byId("calcForm").addEventListener("submit",e=>{e.preventDefault();calculate()});
+ byId("saveBtn").addEventListener("click",saveItem);
+ byId("exportBtn").addEventListener("click",exportCSV);
+ byId("clearBtn").addEventListener("click",clearList);
+ byId("saveSettingsBtn").addEventListener("click",saveSettings);
+ byId("gpsBtn").addEventListener("click",gpsEstimate);
+ byId("startScanBtn").addEventListener("click",startScanner);
+ byId("stopScanBtn").addEventListener("click",stopScanner);
+ byId("lookupBtn").addEventListener("click",lookupProduct);
+ byId("searchBox").addEventListener("input",loadItems);
+ loadItems();
+ if("serviceWorker" in navigator){navigator.serviceWorker.register("./service-worker.js").catch(()=>{})}
+});
 })();
 </script>
 </body>
